@@ -61,6 +61,9 @@ playGame.prototype = {
 		this.scaleFishy = 110;
 		this.randomFish = Math.random()*5;
 		this.randomBlueFishSize = Math.random()*2;
+		this.randomSpawnWidth = Math.random()*game.world.width;
+		this.randomSpawnHeight = Math.random()*game.world.height;
+
 
 //The score------------------------------------------------
 		var style = { font: "65px Helvetica", fill: "#ff0044", align: "center" };
@@ -72,33 +75,25 @@ playGame.prototype = {
 	    this.badFishes.enableBody = true;
 	    this.badFishes.physicsBodyType = Phaser.Physics.ARCADE;
 	    // this.createBadFish();
-
 	    // this.badFishes = this.game.time.events.loop(Phaser.Timer.SECOND * 5, this.createBarrel, this)
 
 //blue fish-------------------------------------------------
-
 		game.physics.startSystem(Phaser.Physics.ARCADE);
-
-		this.blueFish = this.add.sprite(game.width/2, game.height/2,"blueFish");
+		this.blueFish = this.add.sprite(this.randomSpawnWidth, this.randomSpawnHeight,"blueFish");
   		game.physics.arcade.enable(this.blueFish);
   		this.blueFish.scale.setTo(this.randomBlueFishSize, this.randomBlueFishSize);
- 		
- 		game.time.events.add(Phaser.Timer.SECOND * 4, this.addBlueFish, this);
 
-		
 //ground-----------------------------------------------------
 		this.ground = this.add.sprite(game.width/2, game.height-100,"ground");
   		game.physics.arcade.enable(this.ground);
   		this.ground.body.allowGravity = false;
     	this.ground.body.immovable = true;
+
 //PLAYER FISH------------------------------------------------
 		this.fish = this.add.sprite(game.width/2, game.height/3,"fish");
 	    this.fish.anchor.set(0.5);
 	    game.physics.arcade.enable(this.fish);
 	   	this.fish.body.collideWorldBounds=true;
-
-		console.log(this.randomFish);
-
 	},
 
 	update:function() {
@@ -107,13 +102,10 @@ playGame.prototype = {
 		if (this.blueFish.x >= game.width + this.blueFish.width){
 			this.blueFish.destroy();
 		}
-
 		game.physics.arcade.collide(this.fish, this.ground);
     	game.physics.arcade.overlap(this.fish, this.blueFish, this.playerAndBlueCollide, null, this);
 
-
-
-
+ 		game.time.events.add(Phaser.Timer.SECOND * 4, this.addBlueFish, this);
 
 
 //CONTROLS-------------------------------------------------------------------------------------
@@ -140,37 +132,35 @@ playGame.prototype = {
 	    }
 	 },
 
-	descend:function() {
+	descend:function(){
 	    this.badFishes.body.y += 110;
 	},
 
 	addBlueFish:function(){
 		// var randomValue = game.rnd.integerInRange(0, 25);
-		this.newBlueFish = this.add.sprite(game.width/2, game.height/2,"blueFish");
+		this.newBlueFish = this.add.sprite(this.randomSpawnWidth, this.randomSpawnHeight,"blueFish");
   		game.physics.arcade.enable(this.newBlueFish);
   		this.newBlueFish.scale.setTo(this.randomBlueFishSize, this.randomBlueFishSize);
-
 	},
 
+	// createBadFish:function(){
+	//     for (var y = 0; y < 4; y++){
+	//         for (var x = 0; x < 10; x++){
+	//             this.badFishCreate = this.badFishes.create(x * 75, y * 75, 'fish');
+	//             this.badFishCreate.anchor.setTo(0.5, 0.5);
+	//             //this.badFishCreate.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
+	//             //this.badFishCreate.play('fly');
+	//             this.badFishCreate.body.moves = false;
+	//         }
+	//     }
 
-	createBadFish:function() {
-	    for (var y = 0; y < 4; y++){
-	        for (var x = 0; x < 10; x++)
-	        {
-	            this.badFishCreate = this.badFishes.create(x * 75, y * 75, 'fish');
-	            this.badFishCreate.anchor.setTo(0.5, 0.5);
-	            //this.badFishCreate.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-	            //this.badFishCreate.play('fly');
-	            this.badFishCreate.body.moves = false;
-	        }
-	    }
-	    this.badFishes.x = 100;
-	    this.badFishes.y = 50;
-	    //  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-	    var tween = game.add.tween(this.badFishes).to( { x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
-	    //  When the tween loops it calls descend
-	    tween.onLoop.add(this.descend, this);
-	},
+	//     this.badFishes.x = 100;
+	//     this.badFishes.y = 50;
+	//     //  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
+	//     var tween = game.add.tween(this.badFishes).to( { x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+	//     //  When the tween loops it calls descend
+	//     tween.onLoop.add(this.descend, this);
+	// },
 }
 
 // var gameOverScreen = function(game){};
