@@ -4,7 +4,7 @@
 var game;
 
 window.onload = function(){
-	game = new Phaser.Game(640, 960, Phaser.AUTO, "");
+	game = new Phaser.Game(960, 640, Phaser.AUTO, "");
 	game.state.add("Boot",boot);
 	game.state.add("Preload", preload);
 	game.state.add("TitleScreen", titleScreen);
@@ -56,32 +56,33 @@ titleScreen.prototype = {
 var playGame = function(game){};
 playGame.prototype = {
 	create:function(){
-		
-		this.eaten = 0;
-		this.scaleFishy = 110;
-		this.randomFish = Math.random()*5;
-		this.randomBlueFishSize = Math.random()*2;
-		this.randomSpawnWidth = Math.random()*game.world.width;
-		this.randomSpawnHeight = Math.random()*game.world.height;
+		this.eatValue =0;
+		this.loadEnemyLeft();
 
+		// this.eaten = 0;
+		// this.scaleFishy = 110;
+		// this.randomFish = Math.random()*5;
+		// this.randomBlueFishSize = Math.random()*2;
+		// this.randomSpawnWidth = Math.floor((Math.random() * game.world.width) - 10);
+		 // this.randomSpawnHeight = Math.floor((Math.random() * game.world.height) - 10);
+
+//for loop test--------------------------------------
+		// var testing =[1,2,3,4,5];
+		// var total = 0;
+
+		// for (var i = 0; i < testing.length; i++) {
+		// 	console.log(testing.length);
+		// 	// console.log(testing[i]); 
+		// 	total = total + testing[i];
+		// }
+		// console.log("the sum of the array is " + total);
+		// var avg = total / testing.length;
+		// console.log("array's average is "+ avg + " because " + total + " / " + testing.length);
 
 //The score------------------------------------------------
-		var style = { font: "65px Helvetica", fill: "#ff0044", align: "center" };
-	    var text = game.add.text(game.world.width/3, game.world.height/4, "eaten:"+ this.eaten , style);
-	    text.anchor.set(0.5);
-
-//The baddies------------------------------------------------
-	    this.badFishes = game.add.group();
-	    this.badFishes.enableBody = true;
-	    this.badFishes.physicsBodyType = Phaser.Physics.ARCADE;
-	    // this.createBadFish();
-	    // this.badFishes = this.game.time.events.loop(Phaser.Timer.SECOND * 5, this.createBarrel, this)
-
-//blue fish-------------------------------------------------
-		game.physics.startSystem(Phaser.Physics.ARCADE);
-		this.blueFish = this.add.sprite(this.randomSpawnWidth, this.randomSpawnHeight,"blueFish");
-  		game.physics.arcade.enable(this.blueFish);
-  		this.blueFish.scale.setTo(this.randomBlueFishSize, this.randomBlueFishSize);
+		// var style = { font: "65px Helvetica", fill: "#ff0044", align: "center" };
+	 //    var text = game.add.text(game.world.width/3, game.world.height/4, "eaten:"+ this.eaten , style);
+	 //    text.anchor.set(0.5);
 
 //ground-----------------------------------------------------
 		this.ground = this.add.sprite(game.width/2, game.height-100,"ground");
@@ -96,17 +97,32 @@ playGame.prototype = {
 	   	this.fish.body.collideWorldBounds=true;
 	},
 
-	update:function() {
 
-		this.blueFish.x += .08;
-		if (this.blueFish.x >= game.width + this.blueFish.width){
-			this.blueFish.destroy();
-		}
-		game.physics.arcade.collide(this.fish, this.ground);
-    	game.physics.arcade.overlap(this.fish, this.blueFish, this.playerAndBlueCollide, null, this);
+update:function() {
 
- 		game.time.events.add(Phaser.Timer.SECOND * 4, this.addBlueFish, this);
+//COLLISIONS-----------------------------------------------------
+		// this.game.physics.arcade.overlap(this.fish, this.enemyFish);
+		this.game.physics.arcade.overlap(this.fish, this.enemyFish, null, function(fish, enemy) {
+            
 
+            console.log("hit");
+            enemy.kill();
+            fish.scale.x += .5;
+            fish.scale.y += .5;
+            this.eatValue +=1;
+
+            if(this.eatValue >= 5){
+            	console.log("ate 5 fish!");
+            }
+
+            if(this.fish.width >= 96){
+            	this.fish.scale.x = -10;
+            	this.fish.scale.y = -10;
+            }
+
+        }, this);
+
+		console.log(this.fish.width);
 
 //CONTROLS-------------------------------------------------------------------------------------
 	    //  If the sprite is > 8px away from the pointer then let's move to it
@@ -117,50 +133,51 @@ playGame.prototype = {
 	        //  Otherwise turn off velocity because we're close enough to the pointer
 	        this.fish.body.velocity.set(0);
 	    }
+
+    	this.enemyFish.forEach(function(element) {
+	        if (element.x >= this.game.width) {
+	            element.kill();
+	        }
+        }, this);
 	},
-
-	playerAndBlueCollide: function() {
-	    //console.log(this.randomFish);
-	    if(this.fish.width <= this.blueFish.width){
-	    	this.fish.scale.setTo(this.fish.scale.x+ 1, this.fish.scale.y+ 1);
-	    	this.blueFish.destroy();
-
-	    } else{
-	    	console.log(this.eaten);
-			this.fish.scale.setTo(this.fish.scale.x+ 1, this.fish.scale.y+ 1);
-	    	this.blueFish.destroy();
-	    }
-	 },
-
-	descend:function(){
-	    this.badFishes.body.y += 110;
+	
+//FUNCTIONS-------------------------------------------------------
+	loadEnemyLeft:function(){
+		this.enemyFish = this.add.group();
+        this.enemyFish.enableBody = true;
+        this.createEnemyFishLeft();
+        this.superFishCreator = this.game.time.events.loop(Phaser.Timer.SECOND * 3, this.createEnemyFishLeft, this);
 	},
+ 	
+	createEnemyFishLeft: function() {
+        //get the first dead sprite.
+        var singleEnemyFish = this.enemyFish.getFirstExists(true);
+        var randomSpawnHeight = Math.floor((Math.random() * game.world.height));
 
-	addBlueFish:function(){
-		// var randomValue = game.rnd.integerInRange(0, 25);
-		this.newBlueFish = this.add.sprite(this.randomSpawnWidth, this.randomSpawnHeight,"blueFish");
-  		game.physics.arcade.enable(this.newBlueFish);
-  		this.newBlueFish.scale.setTo(this.randomBlueFishSize, this.randomBlueFishSize);
+        if (!singleEnemyFish) {
+            singleEnemyFish = this.enemyFish.create(0, 0, "blueFish");
+    	}
+
+        // singleEnemyFish.animations.add("fire", [0, 1, 2, 3], 12, true);
+        // singleEnemyFish.scale.x = -1;
+        // singleEnemyFish.play("fire");
+        // singleEnemyFish.body.collideWorldBounds = true;
+        singleEnemyFish.body.bounce.set(1, 0);
+
+        //{"x": 5804, "y": 200}
+        //singleEnemyFish.reset(this.levelData.soccerBallspawn.x, this.levelData.soccerBallspawn.y);
+        singleEnemyFish.reset(-68 , randomSpawnHeight);
+        singleEnemyFish.body.velocity.x = 555;
+    },
+
+//FISH SCALE not working--------------------------------------------------
+	tooBigFish:function(){
+		if (this.fish.scale.x >= 8){
+			// this.fish.scale.x = 10;
+			// this.fish.scale.y = 10;
+			console.log("too big");
+		}
 	},
-
-	// createBadFish:function(){
-	//     for (var y = 0; y < 4; y++){
-	//         for (var x = 0; x < 10; x++){
-	//             this.badFishCreate = this.badFishes.create(x * 75, y * 75, 'fish');
-	//             this.badFishCreate.anchor.setTo(0.5, 0.5);
-	//             //this.badFishCreate.animations.add('fly', [ 0, 1, 2, 3 ], 20, true);
-	//             //this.badFishCreate.play('fly');
-	//             this.badFishCreate.body.moves = false;
-	//         }
-	//     }
-
-	//     this.badFishes.x = 100;
-	//     this.badFishes.y = 50;
-	//     //  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-	//     var tween = game.add.tween(this.badFishes).to( { x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
-	//     //  When the tween loops it calls descend
-	//     tween.onLoop.add(this.descend, this);
-	// },
 }
 
 // var gameOverScreen = function(game){};
