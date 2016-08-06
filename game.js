@@ -56,33 +56,22 @@ titleScreen.prototype = {
 var playGame = function(game){};
 playGame.prototype = {
 	create:function(){
-		this.eatValue =0;
+		this.eatValue =0;		
+
 		this.loadEnemyLeft();
 
-		// this.eaten = 0;
+
 		// this.scaleFishy = 110;
 		// this.randomFish = Math.random()*5;
 		// this.randomBlueFishSize = Math.random()*2;
 		// this.randomSpawnWidth = Math.floor((Math.random() * game.world.width) - 10);
 		 // this.randomSpawnHeight = Math.floor((Math.random() * game.world.height) - 10);
 
-//for loop test--------------------------------------
-		// var testing =[1,2,3,4,5];
-		// var total = 0;
 
-		// for (var i = 0; i < testing.length; i++) {
-		// 	console.log(testing.length);
-		// 	// console.log(testing[i]); 
-		// 	total = total + testing[i];
-		// }
-		// console.log("the sum of the array is " + total);
-		// var avg = total / testing.length;
-		// console.log("array's average is "+ avg + " because " + total + " / " + testing.length);
-
-//The score------------------------------------------------
-		// var style = { font: "65px Helvetica", fill: "#ff0044", align: "center" };
-	 //    var text = game.add.text(game.world.width/3, game.world.height/4, "eaten:"+ this.eaten , style);
-	 //    text.anchor.set(0.5);
+//The score need to get value from update------------------------------------------------
+		// this.style = { font: "65px Helvetica", fill: "#ff0044", align: "center" };
+	 //    this.text = game.add.text(game.world.width/3, game.world.height/4, "eaten:"+ this.eatValue , this.style);
+	 //    this.text.anchor.set(0.5);
 
 //ground-----------------------------------------------------
 		this.ground = this.add.sprite(game.width/2, game.height-100,"ground");
@@ -97,29 +86,31 @@ playGame.prototype = {
 	   	this.fish.body.collideWorldBounds=true;
 	},
 
-
 update:function() {
 
 //COLLISIONS-----------------------------------------------------
 		// this.game.physics.arcade.overlap(this.fish, this.enemyFish);
 		this.game.physics.arcade.overlap(this.fish, this.enemyFish, null, function(fish, enemy) {
-            
 
-            console.log("hit");
-            enemy.kill();
-            fish.scale.x += .5;
-            fish.scale.y += .5;
-            this.eatValue +=1;
+			if(fish.width >= enemy.width){
+	            enemy.kill();
+	            fish.scale.x += .05;
+	            fish.scale.y += .05;
+	            this.eatValue +=1;
 
-            if(this.eatValue >= 5){
-            	console.log("ate 5 fish!");
-            }
+	            if(this.eatValue >= 5){
+	            	console.log("ate 5 fish!");
+	            }
+	            //need to change this!
+	            // if(this.fish.width >= 96){
+	            // 	this.fish.scale.x = -10;
+	            // 	this.fish.scale.y = -10;
+	            // }
 
-            if(this.fish.width >= 96){
-            	this.fish.scale.x = -10;
-            	this.fish.scale.y = -10;
-            }
-
+        	}
+        	else{
+        		fish.kill();
+        	}
         }, this);
 
 		console.log(this.fish.width);
@@ -139,46 +130,57 @@ update:function() {
 	            element.kill();
 	        }
         }, this);
-	},
+},
 	
 //FUNCTIONS-------------------------------------------------------
 	loadEnemyLeft:function(){
 		this.enemyFish = this.add.group();
         this.enemyFish.enableBody = true;
-        this.createEnemyFishLeft();
+        for (var i = 0; i < 6; i++){
+        	this.createEnemyFishLeft();
+    	}
         this.superFishCreator = this.game.time.events.loop(Phaser.Timer.SECOND * 3, this.createEnemyFishLeft, this);
 	},
  	
 	createEnemyFishLeft: function() {
+		for (var i = 0; i < 6; i++){
+
         //get the first dead sprite.
-        var singleEnemyFish = this.enemyFish.getFirstExists(true);
-        var randomSpawnHeight = Math.floor((Math.random() * game.world.height));
+	        // var singleEnemyFish = this.enemyFish.getFirstExists(true);
+	        var randomSpawnHeight = Math.floor((Math.random() * game.world.height));
+	        var randomSpawnWidth = Math.floor((Math.random() * game.world.width-game.world.width));
 
-        if (!singleEnemyFish) {
-            singleEnemyFish = this.enemyFish.create(0, 0, "blueFish");
-    	}
+	        var randomEnemyWidth = Math.floor((Math.random()* 105));
 
+	        // if (!singleEnemyFish) {
+				var singleEnemyFish = this.enemyFish.create(0, 0, "blueFish");
+	            singleEnemyFish.width = randomEnemyWidth;
+	            singleEnemyFish.anchor.set(0.5);
+	            singleEnemyFish.reset(randomSpawnWidth , randomSpawnHeight);
+	        	singleEnemyFish.body.velocity.x = 55;
+		    // }
         // singleEnemyFish.animations.add("fire", [0, 1, 2, 3], 12, true);
         // singleEnemyFish.scale.x = -1;
         // singleEnemyFish.play("fire");
         // singleEnemyFish.body.collideWorldBounds = true;
-        singleEnemyFish.body.bounce.set(1, 0);
+        // singleEnemyFish.body.bounce.set(1, 0);
 
         //{"x": 5804, "y": 200}
         //singleEnemyFish.reset(this.levelData.soccerBallspawn.x, this.levelData.soccerBallspawn.y);
-        singleEnemyFish.reset(-68 , randomSpawnHeight);
-        singleEnemyFish.body.velocity.x = 555;
-    },
+      
+    	}
+	}
+}    
 
 //FISH SCALE not working--------------------------------------------------
-	tooBigFish:function(){
-		if (this.fish.scale.x >= 8){
-			// this.fish.scale.x = 10;
-			// this.fish.scale.y = 10;
-			console.log("too big");
-		}
-	},
-}
+	// 	tooBigFish:function(){
+	// 		if (this.fish.scale.x >= 8){
+	// 			this.fish.scale.x = 10;
+	// 			this.fish.scale.y = 10;
+	// 			console.log("too big");
+	// 		}
+	// 	},
+	// }
 
 // var gameOverScreen = function(game){};
 // titleScreen.prototype = {
