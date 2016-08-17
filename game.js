@@ -94,8 +94,8 @@ update:function() {
 
 			if(fish.width >= enemy.width){
 	            enemy.kill();
-	            fish.scale.x += .05;
-	            fish.scale.y += .05;
+	            fish.scale.x += .02;
+	            fish.scale.y += .02;
 	            this.eatValue +=1;
 
 	            if(this.eatValue >= 5){
@@ -109,7 +109,7 @@ update:function() {
 
         	}
         	else{
-        		fish.kill();
+        		// fish.kill();
         	}
         }, this);
 
@@ -119,7 +119,7 @@ update:function() {
 	    //  If the sprite is > 8px away from the pointer then let's move to it
 	    if (game.physics.arcade.distanceToPointer(this.fish, game.input.activePointer) > 8){
 	        //  Make the object seek to the active pointer (mouse or touch).
-	        game.physics.arcade.moveToPointer(this.fish, 300);
+	        game.physics.arcade.moveToPointer(this.fish, 100);
 	    }else{
 	        //  Otherwise turn off velocity because we're close enough to the pointer
 	        this.fish.body.velocity.set(0);
@@ -143,21 +143,22 @@ update:function() {
 	},
  	
 	createEnemyFishLeft: function() {
-		for (var i = 0; i < 6; i++){
+		// for (var i = 0; i < 2; i++){
 
         //get the first dead sprite.
 	        // var singleEnemyFish = this.enemyFish.getFirstExists(true);
 	        var randomSpawnHeight = Math.floor((Math.random() * game.world.height));
 	        var randomSpawnWidth = Math.floor((Math.random() * game.world.width-game.world.width));
-
 	        var randomEnemyWidth = Math.floor((Math.random()* 105));
+	       	var randomEnemyVelocity = Math.floor((Math.random()* 205));
+
 
 	        // if (!singleEnemyFish) {
 				var singleEnemyFish = this.enemyFish.create(0, 0, "blueFish");
 	            singleEnemyFish.width = randomEnemyWidth;
 	            singleEnemyFish.anchor.set(0.5);
 	            singleEnemyFish.reset(randomSpawnWidth , randomSpawnHeight);
-	        	singleEnemyFish.body.velocity.x = 55;
+	        	singleEnemyFish.body.velocity.x = randomEnemyVelocity;
 		    // }
         // singleEnemyFish.animations.add("fire", [0, 1, 2, 3], 12, true);
         // singleEnemyFish.scale.x = -1;
@@ -168,7 +169,7 @@ update:function() {
         //{"x": 5804, "y": 200}
         //singleEnemyFish.reset(this.levelData.soccerBallspawn.x, this.levelData.soccerBallspawn.y);
       
-    	}
+    	// }
 	}
 }    
 
