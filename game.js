@@ -100,6 +100,8 @@ update:function() {
 
 	            if(this.eatValue >= 5){
 	            	console.log("ate 5 fish!");
+	            	this.enemyFish.kill();
+	            	this.fish.kill();
 	            }
 	            //need to change this!
 	            // if(this.fish.width >= 96){
